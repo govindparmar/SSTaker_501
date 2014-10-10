@@ -16,13 +16,13 @@ private:
 	HWND hwTarget;
 	HDC windowDC, tempDC;
 	int count;
-
+	int xd, yd;
 public:
 	string NextFileName();
 	void InitFH();
 	void InitIH();
 	void InitInfo();	
-	CBMPWriter(HWND, const char*);
+	CBMPWriter(HWND, int);
 	~CBMPWriter();
 	void SaveBMP();
 };

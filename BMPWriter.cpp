@@ -4,6 +4,7 @@
 // Generates the next filename to write out the bitmap data to.
 string CBMPWriter::NextFileName()
 {
+	string next_filename;
 	int temp = count;
 	int num_digits = log10(temp)+1;
 	//if(num_digits<=0) num_digits=1;
@@ -61,8 +62,8 @@ CBMPWriter::CBMPWriter(HWND window, int tick)
 	count = tick;
 	strcpy(fname, NextFileName().c_str());
 	GetWindowRect(hwTarget, &r);
-	int xd = r.right - r.left;
-	int yd = r.bottom - r.top;
+	 xd = r.right - r.left;
+	 yd = r.bottom - r.top;
 	count=0;
 	InitFH();
 	InitIH();

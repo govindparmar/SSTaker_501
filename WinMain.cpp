@@ -12,7 +12,7 @@ const TCHAR szClassName[] = TEXT("ScreenSnapperWnd");
 // Function prototypes
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK SysFontProc(HWND, LPARAM);
-HWND hwTarget = (HWND)0x0000000, hStaticWI = (HWND)0x00000000, hStart, hStop, hFindTarget, hTimerMS, hStaticE; 
+HWND hwTarget = (HWND)0x0000000, hStaticWI = (HWND)0x00000000, hWnd, hStart, hStop, hFindTarget, hTimerMS, hStaticE;
 
 /** Refactor #1:
  * Given the length of WinMain, extract some methods from it, namely, the initialization of the WNDCLASSEX structure 
@@ -52,8 +52,7 @@ VOID CreateChildWindows()
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	WNDCLASSEX wcex;
-	HWND hWnd,
+	
 	MSG Msg;
 
 	if(!RegisterWindowClass(hInstance))
@@ -61,7 +60,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		MessageBox(0, L"Window Registration Failed!", L"Error", MB_OK|MB_ICONSTOP);
 		return -1;
 	}
-
+	hWnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, szClassName, TEXT("Screenshot Taker"), WS_VISIBLE | WS_SYSMENU, 100, 100, 290, 210, NULL, NULL, GetModuleHandle(NULL), NULL);
 	CreateChildWindows();
 	
 	ShowWindow(hWnd, SW_SHOW);
@@ -117,7 +116,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			TCHAR *lenBuf = new TCHAR[len];
 			GetWindowText(FindWindowEx(hWnd, NULL, TEXT("EDIT"), NULL), lenBuf, len);
 			int ms = _wtoi(lenBuf);
-			MessageBox(0, lenBuf, L"", MB_OK);
 			if (ms == 0)ms++;
 			bmpT = new CBMPTimer(hwTarget, ms);
 		}
