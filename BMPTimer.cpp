@@ -8,6 +8,7 @@ CBMPTimer::CBMPTimer(HWND hWnd, int ms)
 	thistimer = reinterpret_cast<LPVOID>(this);
 	hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StaticThreadProc, thistimer, 0, NULL);
 	timeractive = true;
+	ticks_so_far=0;
 }
 
 CBMPTimer::~CBMPTimer()
@@ -20,16 +21,14 @@ DWORD CBMPTimer::StaticThreadProc(LPVOID lpParam)
 	return pThis->ThreadProc(lpParam);
 }
 DWORD CBMPTimer::ThreadProc(LPVOID lpParam)
-{
-	int i = 0;
+{	
 	while (timeractive)
 	{
 	//MessageBox(0, L"In ThreadProc", L"", MB_OK);
 		Sleep(ms_interval);
-		CBMPWriter bmpW(hwTarget, NameG.GetNextFileName().c_str());
+		CBMPWriter bmpW(hwTarget, ++ticks_so_far);
 		bmpW.SaveBMP();
 		bmpW.~CBMPWriter();
-		i++;
 	}
 	//ExitThread(0x0);
 	return EXIT_SUCCESS;

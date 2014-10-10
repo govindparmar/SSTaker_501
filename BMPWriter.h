@@ -1,6 +1,8 @@
 #pragma once
 #include <Windows.h>
 #include <tchar.h>
+#include <string>
+using namespace std;
 class CBMPWriter
 {
 private:
@@ -13,9 +15,10 @@ private:
 	HBITMAP hBitmap;
 	HWND hwTarget;
 	HDC windowDC, tempDC;
-
+	int count;
 
 public:
+	string NextFileName();
 	void InitFH();
 	void InitIH();
 	void InitInfo();	

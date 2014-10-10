@@ -1,7 +1,6 @@
 // The below files include my self-written classes for this project.
 #include "BMPWriter.h"
 #include "BMPTimer.h"
-#include "FileNameGenerator.h"
 
 // The below two files allow for necessary Windows API and Process API functions in this project
 #include <Windows.h>

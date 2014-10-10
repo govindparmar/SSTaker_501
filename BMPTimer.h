@@ -1,12 +1,11 @@
 #include <Windows.h>
 #include "BMPWriter.h"
-#include "FileNameGenerator.h"
 class CBMPTimer
 {
 private:
+	int ticks_so_far; // New variable added with refactor #3 - keeps track of ticks made by our timer
 	int ms_interval;
 	HWND hwTarget;
-	CFileNameGenerator NameG;
 	HANDLE hThread;
 	LPVOID thistimer;
 	static bool timeractive;
