@@ -1,5 +1,11 @@
 #include "MsgHandler.h"
+#define FINDBUTTON(wtxt) (FindWindowQ((TEXT("BUTTON")), (L##wtxt)))
+#define FINDEDIT (FindWindowQ((TEXT("EDIT")), (NULL)))
 HWND CMsgHandler::hwTarget;
+inline HWND CMsgHandler::FindWindowQ(LPCWSTR className, LPCWSTR winText)
+{
+	return FindWindowEx(hWnd, NULL, className, winText);
+}
 VOID CMsgHandler::Handle_Close()
 {
 	DestroyWindow(hWnd);
@@ -48,15 +54,17 @@ CMsgHandler::CMsgHandler(HWND ahWnd, UINT aMsg, WPARAM awParam, LPARAM alParam, 
 	wParam = awParam;
 	lParam = alParam;
 	
-	hStartBtn = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Start"));
-	hStopBtn = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Stop"));
-	hSelect = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Select Window"));
+	hStartBtn = FINDBUTTON("Start");
+	hStopBtn = FINDBUTTON("Stop");
+	hSelect = FINDBUTTON("Select Window");
+
 	hStatic2 = hStaticW;
 	if (Msg == WM_CLOSE) Handle_Close();
 	else if (Msg == WM_DESTROY) Handle_Destroy();
 	else if (Msg == WM_COMMAND) Handle_Command();
 	else Handle_Generic();
 }
+
 
 VOID CMsgHandler::Handle_Select()
 {
@@ -80,10 +88,10 @@ VOID CMsgHandler::Handle_Select()
 VOID CMsgHandler::Handle_Start()
 {
 	EnableWindow((HWND)lParam, FALSE);
-	EnableWindow(FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Stop")), TRUE);
+	EnableWindow(FINDBUTTON("Stop"), TRUE);
 	int len = GetWindowTextLength(FindWindowEx(hWnd, NULL, TEXT("EDIT"), NULL)) + 1;
 	TCHAR *lenBuf = new TCHAR[len];
-	GetWindowText(FindWindowEx(hWnd, NULL, TEXT("EDIT"), NULL), lenBuf, len);
+	GetWindowText(FINDEDIT, lenBuf, len);
 	int ms = _wtoi(lenBuf);
 	if (ms == 0)ms++;
 	bmpT = new CBMPTimer(hwTarget, ms);
@@ -93,12 +101,12 @@ VOID CMsgHandler::Handle_Stop()
 {
 	bmpT->StopTimer();
 	EnableWindow((HWND)lParam, FALSE);
-	EnableWindow(FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Start")), TRUE);
+	EnableWindow(FINDBUTTON("Start"), TRUE);
 }
 
 CMsgHandler::~CMsgHandler()
 {
-	WM_CREATE;
+
 }
 
 LRESULT CMsgHandler::Get_Return()

@@ -12,6 +12,7 @@ private:
 	CBMPTimer *bmpT;
 	LRESULT return_val;
 public:
+	inline HWND FindWindowQ(LPCWSTR className, LPCWSTR winText);
 	VOID Handle_Close();
 	VOID Handle_Destroy();
 	VOID Handle_Command();
