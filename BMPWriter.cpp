@@ -1,22 +1,19 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "BMPWriter.h"
 
-
-CBMPWriter::CBMPWriter(HWND window, const char *filename)
+/** Initalizes the fields in the bitmap file header - file signature, header size, etc... */
+void CBMPWriter::InitFH()
 {
-	// Initialize the bitmap file headers
-	RECT r;
-	hwTarget = window;
-	strcpy(fname, filename);
-	GetWindowRect(hwTarget, &r);
-	int xd = r.right - r.left;
-	int yd = r.bottom - r.top;
 	bfHeader.bfType = 0x4d42; 
 	bfHeader.bfSize = 0;
 	bfHeader.bfReserved1 = 0;
 	bfHeader.bfReserved2 = 0;
 	bfHeader.bfOffBits = sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+}
 
+/** Initalizes the bitmap info header structure - bit intensity, planes, dimensions etc... */
+void CBMPWriter::InitIH()
+{
 	biHeader.biSize = sizeof(biHeader);
 	biHeader.biBitCount = 24;
 	biHeader.biCompression = BI_RGB;
@@ -28,8 +25,26 @@ CBMPWriter::CBMPWriter(HWND window, const char *filename)
 	biHeader.biYPelsPerMeter = 0;
 	biHeader.biClrImportant = 0;
 	biHeader.biClrUsed = 0;
+}
 
+void CBMPWriter::InitInfo()
+{
 	bInfo.bmiHeader = biHeader;
+}
+
+CBMPWriter::CBMPWriter(HWND window, const char *filename)
+{
+	// Initialize the bitmap file headers
+	RECT r;
+	hwTarget = window;
+	strcpy(fname, filename);
+	GetWindowRect(hwTarget, &r);
+	int xd = r.right - r.left;
+	int yd = r.bottom - r.top;
+	
+	InitFH();
+	InitIH();
+	InitInfo();
 
 	len_data = ((((24 * xd + 31)&(~31)) / 8)*yd);
 
@@ -39,8 +54,6 @@ CBMPWriter::CBMPWriter(HWND window, const char *filename)
 	hBitmap = CreateDIBSection(windowDC, &bInfo, DIB_RGB_COLORS, (void**)&data, 0, 0);
 	SelectObject(tempDC, hBitmap);
 	BitBlt(tempDC, 0, 0, xd, yd, windowDC, 0, 0, SRCCOPY);
-	
-
 }
 
 CBMPWriter::~CBMPWriter()

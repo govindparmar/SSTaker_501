@@ -16,6 +16,9 @@ private:
 
 
 public:
+	void InitFH();
+	void InitIH();
+	void InitInfo();	
 	CBMPWriter(HWND, const char*);
 	~CBMPWriter();
 	void SaveBMP();
