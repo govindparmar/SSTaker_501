@@ -13,20 +13,21 @@ const TCHAR szClassName[] = TEXT("ScreenSnapperWnd");
 // Function prototypes
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK SysFontProc(HWND, LPARAM);
-HWND hwTarget = (HWND)0x0000000, hStaticWI = (HWND)0x00000000; 
+HWND hwTarget = (HWND)0x0000000, hStaticWI = (HWND)0x00000000, hStart, hStop, hFindTarget, hTimerMS, hStaticE; 
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+/** Refactor #1:
+ * Given the length of WinMain, extract some methods from it, namely, the initialization of the WNDCLASSEX structure 
+ */
+ATOM RegisterWindowClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
-	HWND hWnd, hStart, hStop, hFindTarget, hTimerMS, hStaticE;
-	MSG Msg;
-
+	
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.hbrBackground = (HBRUSH)COLOR_WINDOW;
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-	wcex.hInstance = GetModuleHandle(NULL);
+	wcex.hInstance = hInstance;
 	wcex.style = CS_BYTEALIGNWINDOW | CS_BYTEALIGNCLIENT | CS_GLOBALCLASS;
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = szClassName;
@@ -34,16 +35,36 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 
-	RegisterClassEx(&wcex);
+	return RegisterClassEx(&wcex);
+}
 
-	hWnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, szClassName, TEXT("Screenshot Taker"), WS_VISIBLE | WS_SYSMENU, 100, 100, 290, 210, NULL, NULL, GetModuleHandle(NULL), NULL);
+/**
+ * Still Refactor #1 - extract child Window initialization from WinMain into a new method.
+ */
+VOID CreateChildWindows()
+{
 	hStaticE = CreateWindow(TEXT("STATIC"), TEXT("Enter the interval between screenshots (milliseconds):"), WS_VISIBLE | WS_CHILD, 0, 0, 270, 20, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hTimerMS = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("EDIT"), TEXT("5000"), WS_VISIBLE | WS_CHILD | ES_NUMBER, 0, 22, 270, 20, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hFindTarget = CreateWindow(TEXT("BUTTON"), TEXT("Select Window"), WS_VISIBLE | WS_CHILD | BS_TEXT, 10, 44, 250, 30, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hStaticWI = CreateWindow(TEXT("STATIC"), TEXT(""), WS_VISIBLE | WS_CHILD | SS_LEFT, 0, 88, 270, 40, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hStart = CreateWindow(TEXT("BUTTON"), TEXT("Start"), WS_VISIBLE | WS_CHILD | BS_TEXT, 10, 130, 125, 30, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hStop = CreateWindow(TEXT("BUTTON"), TEXT("Stop"), WS_VISIBLE | WS_CHILD | BS_TEXT | WS_DISABLED, 135, 130, 125, 30, hWnd, NULL, GetModuleHandle(NULL), NULL);
+}
 
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	WNDCLASSEX wcex;
+	HWND hWnd,
+	MSG Msg;
+
+	if(!RegisterWindowClass(hInstance))
+	{
+		MessageBox(0, L"Window Registration Failed!", L"Error", MB_OK|MB_ICONSTOP);
+		return -1;
+	}
+
+	CreateChildWindows();
+	
 	ShowWindow(hWnd, SW_SHOW);
 	EnumChildWindows(hWnd, SysFontProc, 0);
 	UpdateWindow(hWnd);
