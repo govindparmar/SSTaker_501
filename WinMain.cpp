@@ -2,16 +2,11 @@
 #include "BMPWriter.h"
 #include "BMPTimer.h"
 #include "MsgHandler.h"
+
 // The below two files allow for necessary Windows API and Process API functions in this project
 #include <Windows.h>
 #include <Psapi.h>
-
-// Class name - required for all Windows APIs
-const TCHAR szClassName[] = TEXT("ScreenSnapperWnd");
-
-// Function prototypes
-LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK SysFontProc(HWND, LPARAM);
+#include "Global.h"
 HWND hwTarget = (HWND)0x0000000, hStaticWI = (HWND)0x00000000, hWnd, hStart, hStop, hFindTarget, hTimerMS, hStaticE;
 
 /** Refactor #1:
@@ -50,7 +45,9 @@ VOID CreateChildWindows()
 	hStart = CreateWindow(TEXT("BUTTON"), TEXT("Start"), WS_RCHILD | BS_TEXT, 10, 130, 125, 30, hWnd, NULL, GetModuleHandle(NULL), NULL);
 	hStop = CreateWindow(TEXT("BUTTON"), TEXT("Stop"), WS_RCHILD | BS_TEXT | WS_DISABLED, 135, 130, 125, 30, hWnd, NULL, GetModuleHandle(NULL), NULL);
 }
-
+/**
+ * WinMain function - entry point for the application
+ */
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	
@@ -74,13 +71,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	return Msg.wParam;
 }
+// Callback function that sets all child windows of the screenshot taker window to the regular system font
 BOOL CALLBACK SysFontProc(HWND hWnd, LPARAM lParam)
 {
 	HFONT hfDefault = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 	SendMessage(hWnd, WM_SETFONT, (WPARAM)hfDefault, 0);
 	return TRUE;
 }
-
+// Window procedure stub - required to be passed to WNDCLASSEX but invokes CMsgHandler to do all of the actual work
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	CMsgHandler msghandler(hWnd, Msg, wParam, lParam, hStaticWI);

@@ -1,31 +1,40 @@
 #include "MsgHandler.h"
+// Macros for eliminating duplicated code - simplifies method calls to FindWindowEx
 #define FINDBUTTON(wtxt) (FindWindowQ((TEXT("BUTTON")), (L##wtxt)))
 #define FINDEDIT (FindWindowQ((TEXT("EDIT")), (NULL)))
 HWND CMsgHandler::hwTarget;
+// Inline method for handling calls to FindWIndowEx - removes necessity for several duplicated calls etc
 inline HWND CMsgHandler::FindWindowQ(LPCWSTR className, LPCWSTR winText)
 {
 	return FindWindowEx(hWnd, NULL, className, winText);
 }
+
+// Handles the WM_CLOSE message (destroys the window, return 0)
 VOID CMsgHandler::Handle_Close()
 {
 	DestroyWindow(hWnd);
 	return_val = (LRESULT)0;
 }
+
+// Handles the WM_DESTROY message (posts the exit code for the window; return 0)
 VOID CMsgHandler::Handle_Destroy()
 {
 	PostQuitMessage(0);
 	return_val = (LRESULT)0;
 }
 
+// Stub method to handle all calls not specifically supported by our class (call DefWindowProc)
 VOID CMsgHandler::Handle_Generic()
 {
 	return_val = DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
+// Handles the WM_COMMAND message
 VOID CMsgHandler::Handle_Command()
 {
+	// Step 1: identify the source of the command (which button)
 	 hwCmdSource = (HWND)lParam;
-	
+	// Step 2: pass to the appropriate sub-handle for WM_COMMAND based on the button
 	if (hwCmdSource == hSelect)
 	{
 		Handle_Select();
@@ -47,6 +56,8 @@ VOID CMsgHandler::Handle_Command()
 	return_val = (LRESULT)0;
 }
 
+// Class constructor for CMsgHandler 
+//  sets up member variables and determines which message handler to use
 CMsgHandler::CMsgHandler(HWND ahWnd, UINT aMsg, WPARAM awParam, LPARAM alParam, HWND hStaticW)
 {
 	hWnd = ahWnd;
@@ -65,12 +76,14 @@ CMsgHandler::CMsgHandler(HWND ahWnd, UINT aMsg, WPARAM awParam, LPARAM alParam, 
 	else Handle_Generic();
 }
 
-
+// Sub handler for "select window" WM_COMMAND message source
+// Asks the user for the window they want to target,
+//  prints out info about target window on app window
 VOID CMsgHandler::Handle_Select()
 {
 	MessageBox(0, TEXT("If you are targetting a usual Windows application, try to target the *title bar* of the application.  If you are targetting a Java or Flash applet target anywhere within the applet.\n\nPress OK and then hover your mouse over the target window within 2 seconds... (before pressing OK, you can move this message box closer to your target if need be)"), TEXT("Info"), MB_OK | MB_ICONINFORMATION);
 	ShowWindow(hWnd, SW_MINIMIZE);
-	Sleep(3000);
+	Sleep(2000);
 	POINT p;
 	GetCursorPos(&p);
 	hwTarget = WindowFromPoint(p);
@@ -85,11 +98,14 @@ VOID CMsgHandler::Handle_Select()
 
 }
 
+// Handles the "Start" WM_COMMAND message
+// 1. Toggles the enabled state of start and stop button
+// 2. intializes a CBMPTimer with the specified target and specified interval.
 VOID CMsgHandler::Handle_Start()
 {
 	EnableWindow((HWND)lParam, FALSE);
 	EnableWindow(FINDBUTTON("Stop"), TRUE);
-	int len = GetWindowTextLength(FindWindowEx(hWnd, NULL, TEXT("EDIT"), NULL)) + 1;
+	int len = GetWindowTextLength((FINDEDIT)) + 1;
 	TCHAR *lenBuf = new TCHAR[len];
 	GetWindowText(FINDEDIT, lenBuf, len);
 	int ms = _wtoi(lenBuf);
@@ -97,6 +113,10 @@ VOID CMsgHandler::Handle_Start()
 	bmpT = new CBMPTimer(hwTarget, ms);
 }
 
+// Handles a "Stop" WM_COMMAND message
+// 1. Stops the running CBMPTimer 
+// 2. Toggles the enabled state of start and stop button
+ 
 VOID CMsgHandler::Handle_Stop()
 {
 	bmpT->StopTimer();
@@ -108,7 +128,7 @@ CMsgHandler::~CMsgHandler()
 {
 
 }
-
+// Returns the stored LRESULT to WindowProc stub.
 LRESULT CMsgHandler::Get_Return()
 {
 	return return_val;
