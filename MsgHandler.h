@@ -1,21 +1,25 @@
 #pragma once
 #include <Windows.h>
+#include "BMPTimer.h"
 class CMsgHandler
 {
 private:
-	HWND hWnd, hwCmdSource, hStartBtn, hStopBtn, hSelect, hwTarget, hStatic2;
+	static HWND hwTarget;
+	HWND hWnd, hwCmdSource, hStartBtn, hStopBtn, hSelect, hStatic2;
 	UINT Msg;
 	WPARAM wParam;
 	LPARAM lParam;
 	CBMPTimer *bmpT;
+	LRESULT return_val;
 public:
-	LRESULT Handle_Close();
-	LRESULT Handle_Destroy();
-	LRESULT Handle_Command();
+	VOID Handle_Close();
+	VOID Handle_Destroy();
+	VOID Handle_Command();
 	VOID Handle_Start();
 	VOID Handle_Stop();
 	VOID Handle_Select();
-	LRESULT Handle_Generic();
+	VOID Handle_Generic();
+	LRESULT Get_Return();
 	CMsgHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, HWND hStaticW);
 	~CMsgHandler();
 };

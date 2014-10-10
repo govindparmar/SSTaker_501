@@ -1,7 +1,7 @@
 // The below files include my self-written classes for this project.
 #include "BMPWriter.h"
 #include "BMPTimer.h"
-
+#include "MsgHandler.h"
 // The below two files allow for necessary Windows API and Process API functions in this project
 #include <Windows.h>
 #include <Psapi.h>
@@ -79,6 +79,7 @@ BOOL CALLBACK SysFontProc(HWND hWnd, LPARAM lParam)
 	SendMessage(hWnd, WM_SETFONT, (WPARAM)hfDefault, 0);
 	return TRUE;
 }
+/*
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	CBMPTimer *bmpT = NULL;
@@ -129,4 +130,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, Msg, wParam, lParam);
 	}
 	return 0;
+	}*/
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	CMsgHandler *msghandler = new CMsgHandler(hWnd, Msg, wParam, lParam, hStaticWI);
+	return msghandler->Get_Return();
 }

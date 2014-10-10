@@ -1,22 +1,22 @@
 #include "MsgHandler.h"
-#include "BMPTimer.h"
-LRESULT CMsgHandler::Handle_Close()
+HWND CMsgHandler::hwTarget;
+VOID CMsgHandler::Handle_Close()
 {
 	DestroyWindow(hWnd);
-	return (LRESULT)0;
+	return_val = (LRESULT)0;
 }
-LRESULT CMsgHandler::Handle_Destroy()
+VOID CMsgHandler::Handle_Destroy()
 {
 	PostQuitMessage(0);
-	return (LRESULT)0;
+	return_val = (LRESULT)0;
 }
 
-LRESULT CMsgHandler::Handle_Generic()
+VOID CMsgHandler::Handle_Generic()
 {
-	return DefWindowProc(hWnd, Msg, wParam, lParam);
+	return_val = DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
-LRESULT CMsgHandler::Handle_Command()
+VOID CMsgHandler::Handle_Command()
 {
 	 hwCmdSource = (HWND)lParam;
 	
@@ -29,7 +29,8 @@ LRESULT CMsgHandler::Handle_Command()
 		if (hwTarget == NULL)
 		{
 			MessageBox(hWnd, TEXT("Please first select a target window!"), TEXT("Problem"), MB_OK | MB_ICONWARNING);
-			return (LRESULT)0;
+			return_val = (LRESULT)0;
+			return;
 		}
 		Handle_Start();
 	}
@@ -37,15 +38,24 @@ LRESULT CMsgHandler::Handle_Command()
 	{
 		Handle_Stop();
 	}
-	return (LRESULT)0;
+	return_val = (LRESULT)0;
 }
 
-CMsgHandler::CMsgHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, HWND hStaticW)
+CMsgHandler::CMsgHandler(HWND ahWnd, UINT aMsg, WPARAM awParam, LPARAM alParam, HWND hStaticW)
 {
+	hWnd = ahWnd;
+	Msg = aMsg;
+	wParam = awParam;
+	lParam = alParam;
+	
 	hStartBtn = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Start"));
 	hStopBtn = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Stop"));
 	hSelect = FindWindowEx(hWnd, NULL, TEXT("BUTTON"), TEXT("Select Window"));
 	hStatic2 = hStaticW;
+	if (Msg == WM_CLOSE) Handle_Close();
+	else if (Msg == WM_DESTROY) Handle_Destroy();
+	else if (Msg == WM_COMMAND) Handle_Command();
+	else Handle_Generic();
 }
 
 VOID CMsgHandler::Handle_Select()
@@ -64,6 +74,7 @@ VOID CMsgHandler::Handle_Select()
 	wsprintf(sttcbuf, TEXT("Target Window: %s\n(handle = 0x%.8X; rect=(%d,%d)-(%d,%d))"), wndTxt, hwTarget, wRect.left, wRect.top, wRect.right, wRect.bottom);
 	SetWindowText(hStatic2, sttcbuf);
 	ShowWindow(hWnd, SW_RESTORE);
+
 }
 
 VOID CMsgHandler::Handle_Start()
@@ -87,4 +98,10 @@ VOID CMsgHandler::Handle_Stop()
 
 CMsgHandler::~CMsgHandler()
 {
+	WM_CREATE;
+}
+
+LRESULT CMsgHandler::Get_Return()
+{
+	return return_val;
 }
