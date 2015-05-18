@@ -34,6 +34,5 @@ public:
 	~CBMPWriter();
 	// Performs the actual bitmap file write
 	void SaveBMP();
-	friend class UnitTest1;
 };
 
