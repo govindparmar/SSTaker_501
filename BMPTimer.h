@@ -23,5 +23,4 @@ public:
 	// Constructor/deconstructor
 	CBMPTimer(HWND, int);
 	~CBMPTimer();
-	friend class UnitTest1;
 };
