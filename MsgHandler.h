@@ -41,6 +41,5 @@ public:
 	// Constructor/deconstructor
 	CMsgHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam, HWND hStaticW);
 	~CMsgHandler();
-	friend class UnitTest1;
 };
 
