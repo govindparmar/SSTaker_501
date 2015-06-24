@@ -25,8 +25,12 @@ $RECYCLE.BIN/
 .AppleDouble
 .LSOverride
 
+# SQL Server CE IntelliSense database
+*.sdf
+
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
